@@ -3,10 +3,23 @@ class BezierCurve {
 
   BezierCurve(PVector[] positions) {
     cPoints = new ControlPoint[positions.length];
-    
+
     for (int i=0; i<cPoints.length; i++) {
       cPoints[i] = new ControlPoint(positions[i]);
     }
+  }
+
+  void movePoint(ControlPoint p, int x, int y) {
+    p.move(x, y);
+  }
+
+  ControlPoint pointToMove(int x, int y) {
+    for (ControlPoint p : cPoints) {
+      if (p.mouseOnPoint(x, y)) {
+        return p;
+      }
+    }
+    return null;
   }
 
   void draw() {

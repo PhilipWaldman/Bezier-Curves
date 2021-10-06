@@ -6,6 +6,18 @@ class ControlPoint {
     this.pos = pos;
   }
 
+  boolean mouseOnPoint(int x, int y) {
+    return pos.x - size / 2 < x && 
+      pos.x + size / 2 > x && 
+      pos.y - size / 2 < y && 
+      pos.y + size / 2 > y;
+  }
+
+  void move(int x, int y) {
+    pos.x = x;
+    pos.y = y;
+  }
+
   void draw() {
     stroke(255);
     noFill();

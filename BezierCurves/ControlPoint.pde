@@ -1,11 +1,11 @@
 class ControlPoint {
   PVector pos;
   int size = 10;
-  
+
   ControlPoint(PVector pos) {
     this.pos = pos;
   }
-  
+
   void draw() {
     stroke(255);
     noFill();

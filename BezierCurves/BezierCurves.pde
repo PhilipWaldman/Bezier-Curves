@@ -1,21 +1,18 @@
-ControlPoint[] cPoints = new ControlPoint[4];
+BezierCurve curve;
 
 void setup() {
   fullScreen();
-  for (int i=0; i<cPoints.length; i++) {
-    cPoints[i] = new ControlPoint(new PVector(random(width), random(height)));
+
+  PVector[] positions = new PVector[4];
+  for (int i=0; i<positions.length; i++) {
+    positions[i] = new PVector(random(width), random(height));
   }
+
+  curve = new BezierCurve(positions);
 }
 
 void draw() {
   background(0);
-  
-  stroke(255);
-  for (int i=0; i<cPoints.length-1; i++) {
-    line(cPoints[i].pos.x, cPoints[i].pos.y, cPoints[i+1].pos.x, cPoints[i+1].pos.y);
-  }
-  
-  for (ControlPoint p : cPoints) {
-    p.draw();
-  }
+
+  curve.draw();
 }

@@ -10,7 +10,7 @@ class BezierCurve {
     cPoints = new ControlPoint[positions.length];
 
     for (int i=0; i<cPoints.length; i++) {
-      cPoints[i] = new ControlPoint((int) positions[i].x, (int) positions[i].y);
+      cPoints[i] = new ControlPoint(positions[i]);
     }
   }
 
@@ -43,17 +43,75 @@ class BezierCurve {
   }
 
   /**
+   * De Casteljau's algorithm.
+   */
+  PVector deCasteljausAlgorithm(float t) {
+    return deCasteljausAlgorithm(cPoints, t);
+  }
+
+  /**
+   * Recursive De Casteljau's algorithm.
+   */
+  PVector deCasteljausAlgorithm(ControlPoint[] points, float t) {
+    if (points.length == 1) {
+      return points[0].pos;
+    }
+
+    ControlPoint[] newPoints = new ControlPoint[points.length - 1];
+    for (int i=0; i<newPoints.length; i++) {
+      newPoints[i] = lerp(points[i], points[i+1], t);
+    }
+    return deCasteljausAlgorithm(newPoints, t);
+  }
+
+  /**
+   * (1 - t) * p0 + t * p1
+   *
+   * @param cp0
+   * @param cp1
+   * @param t
+   * @return 
+   */
+  ControlPoint lerp(ControlPoint cp0, ControlPoint cp1, float t) {
+    PVector p0 = cp0.pos.copy();
+    PVector p1 = cp1.pos.copy();
+    PVector p = p0.mult(1 - t).add(p1.mult(t));
+    return new ControlPoint(p);
+  }
+
+  /**
    * Draws all components relevant to the Bezier curve.
    */
   void draw() {
+    drawControlPoints(cPoints);
+    drawCurve();
+  }
+
+  void drawCurve() {
+    stroke(255);
+    strokeWeight(5);
+    float dt = 0.001;
+    for (float t=0; t<=1; t+=dt) {
+      PVector p = deCasteljausAlgorithm(t);
+      point(p.x, p.y);
+    }
+  }
+
+  /**
+   *
+   *
+   * @param points
+   */
+  void drawControlPoints(ControlPoint[] points) {
     // Draw control point connecting lines
     stroke(255);
-    for (int i=0; i<cPoints.length-1; i++) {
-      line(cPoints[i].x(), cPoints[i].y(), cPoints[i+1].x(), cPoints[i+1].y());
+    strokeWeight(1);
+    for (int i=0; i<points.length-1; i++) {
+      line(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
     }
 
     // Draw control point handles
-    for (ControlPoint p : cPoints) {
+    for (ControlPoint p : points) {
       p.draw();
     }
   }

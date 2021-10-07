@@ -7,7 +7,7 @@ void setup() {
   // Initialize control points to random positions on the screen
   PVector[] positions = new PVector[4];
   for (int i=0; i<positions.length; i++) {
-    positions[i] = new PVector(random(width), random(height));
+    positions[i] = new PVector((int) random(width), (int) random(height));
   }
 
   curve = new BezierCurve(positions);

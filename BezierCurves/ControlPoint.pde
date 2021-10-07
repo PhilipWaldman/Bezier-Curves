@@ -5,11 +5,10 @@ class ControlPoint {
   /**
    * Initializes a contol point at (x, y).
    * 
-   * @param x The x position of the {@code ControlPoint}.
-   * @param y The y position of the {@code ControlPoint}.
+   * @param pos The position of the {@code ControlPoint}.
    */
-  ControlPoint(int x, int y) {
-    pos = new PVector(x, y);
+  ControlPoint(PVector pos) {
+    this.pos = pos;
   }
 
   /**

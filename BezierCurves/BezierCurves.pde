@@ -4,6 +4,7 @@ ControlPoint pointToMove;
 void setup() {
   fullScreen();
 
+  // Initialize control points to random positions on the screen
   PVector[] positions = new PVector[4];
   for (int i=0; i<positions.length; i++) {
     positions[i] = new PVector(random(width), random(height));

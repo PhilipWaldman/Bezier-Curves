@@ -1,5 +1,11 @@
+import java.util.Map;
+
 class BezierCurve {
   ControlPoint[] cPoints;
+  PVector[] curvePoints;
+  boolean updateCurve = true;
+  HashMap<Float, Float> lut = new HashMap<Float, Float>();
+  PVector[] interpolatedPoints;
 
   /**
    * Initializes the {@code BezierCurve}.
@@ -23,6 +29,7 @@ class BezierCurve {
    */
   void movePoint(ControlPoint p, int x, int y) {
     p.moveTo(x, y);
+    updateCurve = true;
   }
 
   /**
@@ -92,21 +99,55 @@ class BezierCurve {
    */
   void drawCurve() {
     strokeWeight(2);
-    
     int n_segs = 1000;
-    PVector[] points = new PVector[n_segs+1];
-    for (int i=0; i<=n_segs; i++) {
-      float t = 1.0 / n_segs * i;
-      PVector p = deCasteljausAlgorithm(t);
-      points[i] = p;
+
+    if (updateCurve) {
+      curvePoints = new PVector[n_segs+1];
+      PVector prev_point = deCasteljausAlgorithm(0);
+      float dist = 0;
+      for (int i=0; i<=n_segs; i++) {
+        // Generate point on curve by t value.
+        float t = 1.0 / n_segs * i;
+        PVector p = deCasteljausAlgorithm(t);
+        curvePoints[i] = p;
+
+        // Put dist to point in look up table.
+        dist += prev_point.dist(p);
+        lut.put(t, dist);
+        prev_point = p;
+      }
+
+      // Interpolate lut to get evenly spaced points.
+      interpolatedPoints = new PVector[n_segs+1];
+      for (int i=0; i<=n_segs; i++) {
+        float d = dist * i / n_segs;
+        Map.Entry lower = null;
+        for (Map.Entry tDist : lut.entrySet()) {
+          if (d == (float) tDist.getValue()) {
+            interpolatedPoints[i] = deCasteljausAlgorithm((float) tDist.getKey());
+            break;
+          } else if (d > (float) tDist.getValue()) {
+            lower = tDist;
+          } else if (lower != null) {
+            float t = map(d, (float) lower.getValue(), (float) tDist.getValue(), (float) lower.getKey(), (float) tDist.getKey());
+            interpolatedPoints[i] = deCasteljausAlgorithm(t);
+            break;
+          }
+        }
+      }
+
+      updateCurve = false;
     }
 
-    for (int i=0; i<points.length-1; i++) {
-      float t = 1.0 / points.length * i;
-      PVector p0 = points[i];
-      PVector p1 = points[i + 1];
+    // Actually draw the line segments of the curve.
+    for (int i=0; i<interpolatedPoints.length-1; i++) {
+      float t = 1.0 / interpolatedPoints.length * i;
+      PVector p0 = interpolatedPoints[i];
+      PVector p1 = interpolatedPoints[i + 1];
       stroke(255 * (1 - t), 0, 255 * t);
-      line(p0.x, p0.y, p1.x, p1.y);
+      if (p0 != null && p1 != null) {
+        line(p0.x, p0.y, p1.x, p1.y);
+      }
     }
   }
 

@@ -6,6 +6,7 @@ class BezierCurve {
   boolean updateCurve = true;
   HashMap<Float, Float> lut = new HashMap<Float, Float>();
   PVector[] interpolatedPoints;
+  final int n_segs = 1000;
 
   /**
    * Initializes the {@code BezierCurve}.
@@ -51,24 +52,54 @@ class BezierCurve {
 
   /**
    * De Casteljau's algorithm.
+   *
+   * @param t
+   * @return 
    */
   PVector deCasteljausAlgorithm(float t) {
-    return deCasteljausAlgorithm(cPoints, t);
+    return deCasteljausAlgorithm(t, false);
+  }
+
+  /**
+   * De Casteljau's algorithm.
+   *
+   * @param t
+   * @param drawRecursion
+   * @return 
+   */
+  PVector deCasteljausAlgorithm(float t, boolean drawRecursion) {
+    return deCasteljausAlgorithm(cPoints, t, drawRecursion);
   }
 
   /**
    * Recursive De Casteljau's algorithm.
+   *
+   * @param points
+   * @param t
+   * @param drawRecursion
+   * @return 
    */
-  PVector deCasteljausAlgorithm(ControlPoint[] points, float t) {
+  PVector deCasteljausAlgorithm(ControlPoint[] points, float t, boolean drawRecursion) {
     if (points.length == 1) {
+      if (drawRecursion) {
+        drawControlPoints(points);
+      }
       return points[0].pos;
+    }
+
+    if (drawRecursion) {
+      drawControlPoints(points, 
+        points.length != 4 ? 255 : 0, 
+        points.length != 3 ? 255 : 0, 
+        points.length != 2 ? 255 : 0);
     }
 
     ControlPoint[] newPoints = new ControlPoint[points.length - 1];
     for (int i=0; i<newPoints.length; i++) {
       newPoints[i] = lerp(points[i], points[i+1], t);
     }
-    return deCasteljausAlgorithm(newPoints, t);
+
+    return deCasteljausAlgorithm(newPoints, t, drawRecursion);
   }
 
   /**
@@ -90,8 +121,12 @@ class BezierCurve {
    * Draws all components relevant to the Bezier curve.
    */
   void draw() {
-    drawControlPoints(cPoints);
+    //drawControlPoints(cPoints);
     drawCurve();
+    float p = 10000;
+    float m = millis();
+    float t = 2 * abs(m / p - floor(m / p + 0.5));
+    drawDeCasteljau(t);
   }
 
   /**
@@ -99,7 +134,6 @@ class BezierCurve {
    */
   void drawCurve() {
     strokeWeight(2);
-    int n_segs = 1000;
 
     if (updateCurve) {
       curvePoints = new PVector[n_segs+1];
@@ -157,8 +191,20 @@ class BezierCurve {
    * @param points
    */
   void drawControlPoints(ControlPoint[] points) {
+    drawControlPoints(points, 255, 255, 255);
+  }
+
+  /**
+   *
+   *
+   * @param points
+   * @param r
+   * @param g
+   * @param b
+   */
+  void drawControlPoints(ControlPoint[] points, int r, int g, int b) {
     // Draw control point connecting lines
-    stroke(255);
+    stroke(r, g, b);
     strokeWeight(1);
     for (int i=0; i<points.length-1; i++) {
       line(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
@@ -168,5 +214,14 @@ class BezierCurve {
     for (ControlPoint p : points) {
       p.draw();
     }
+  }
+
+  /**
+   *
+   *
+   * @param t
+   */
+  void drawDeCasteljau(float t) {
+    deCasteljausAlgorithm(t, true);
   }
 }

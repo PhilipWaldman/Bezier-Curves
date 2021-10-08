@@ -87,13 +87,26 @@ class BezierCurve {
     drawCurve();
   }
 
+  /**
+   *
+   */
   void drawCurve() {
-    stroke(255);
-    strokeWeight(5);
-    float dt = 0.001;
-    for (float t=0; t<=1; t+=dt) {
+    strokeWeight(2);
+    
+    int n_segs = 1000;
+    PVector[] points = new PVector[n_segs+1];
+    for (int i=0; i<=n_segs; i++) {
+      float t = 1.0 / n_segs * i;
       PVector p = deCasteljausAlgorithm(t);
-      point(p.x, p.y);
+      points[i] = p;
+    }
+
+    for (int i=0; i<points.length-1; i++) {
+      float t = 1.0 / points.length * i;
+      PVector p0 = points[i];
+      PVector p1 = points[i + 1];
+      stroke(255 * (1 - t), 0, 255 * t);
+      line(p0.x, p0.y, p1.x, p1.y);
     }
   }
 

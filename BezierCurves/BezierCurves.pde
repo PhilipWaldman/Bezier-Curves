@@ -28,3 +28,9 @@ void mouseDragged() {
 void mousePressed() {
   pointToMove = curve.pointToMove(mouseX, mouseY);
 }
+
+void keyPressed() {
+  if (key==' ') {
+    curve.drawAlgo = ! curve.drawAlgo;
+  }
+}

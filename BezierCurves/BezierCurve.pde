@@ -4,6 +4,7 @@ class BezierCurve {
   ControlPoint[] cPoints;
   PVector[] curvePoints;
   boolean updateCurve = true;
+  boolean drawAlgo = true;
   HashMap<Float, Float> lut = new HashMap<Float, Float>();
   PVector[] interpolatedPoints;
   final int n_segs = 1000;
@@ -121,12 +122,15 @@ class BezierCurve {
    * Draws all components relevant to the Bezier curve.
    */
   void draw() {
-    //drawControlPoints(cPoints);
     drawCurve();
     float p = 10000;
-    float m = millis();
-    float t = 2 * abs(m / p - floor(m / p + 0.5));
-    drawDeCasteljau(t);
+    if (drawAlgo) {
+      float m = millis();
+      float t = 2 * abs(m / p - floor(m / p + 0.5));
+      drawDeCasteljau(t);
+    } else {
+      drawControlPoints(cPoints);
+    }
   }
 
   /**

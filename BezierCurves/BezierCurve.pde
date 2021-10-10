@@ -1,11 +1,12 @@
 import java.util.Map;
+import java.util.Set;
 
 class BezierCurve {
   ControlPoint[] cPoints;
   PVector[] curvePoints;
   boolean updateCurve = true;
-  boolean drawAlgo = true;
-  HashMap<Float, Float> lut = new HashMap<Float, Float>();
+  boolean drawAlgo = false;
+  HashMap<Float, Float> lut = new HashMap<Float, Float>(); // <t-value, distance to t>
   PVector[] interpolatedPoints;
   final int n_segs = 1000;
 
@@ -123,7 +124,7 @@ class BezierCurve {
    */
   void draw() {
     drawCurve();
-    float p = 10000;
+    float p = 20000;
     if (drawAlgo) {
       float m = millis();
       float t = 2 * abs(m / p - floor(m / p + 0.5));
@@ -154,13 +155,17 @@ class BezierCurve {
         lut.put(t, dist);
         prev_point = p;
       }
+      
+      // To prevent the interpolated points to not be generated in order because sets are not ordered.
+      Map.Entry<Float, Float>[] entryArr = preprocessEntrySet(lut.entrySet());
 
       // Interpolate lut to get evenly spaced points.
       interpolatedPoints = new PVector[n_segs+1];
       for (int i=0; i<=n_segs; i++) {
         float d = dist * i / n_segs;
         Map.Entry lower = null;
-        for (Map.Entry tDist : lut.entrySet()) {
+
+        for (Map.Entry tDist : entryArr) {
           if (d == (float) tDist.getValue()) {
             interpolatedPoints[i] = deCasteljausAlgorithm((float) tDist.getKey());
             break;
@@ -187,6 +192,28 @@ class BezierCurve {
         line(p0.x, p0.y, p1.x, p1.y);
       }
     }
+  }
+
+  /**
+   *
+   *
+   * @param entrySet
+   * @return
+   */
+  Map.Entry<Float, Float>[] preprocessEntrySet(Set<Map.Entry<Float, Float>> entrySet) {
+    Map.Entry<Float, Float>[] entryArr = entrySet.toArray(new Map.Entry[0]);
+
+    for (int i = 1; i < entryArr.length; i++) {
+      Map.Entry<Float, Float> value = entryArr[i];
+      int j = i - 1;
+      while (j >= 0 && entryArr[j].getKey() > value.getKey()) {
+        entryArr[j + 1] = entryArr[j];
+        j = j - 1;
+      }
+      entryArr[j + 1] = value;
+    }
+
+    return entryArr;
   }
 
   /**

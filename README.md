@@ -4,9 +4,9 @@ A demo showing a Bézier curve.
 
 On startup the demo will place four control points at random locations on the screen. These control points can be moved by clicking and dragging them with the cursor. The curve will immediately update when the control points are moved.
 
-![Bézier curve](Bezier Curve.jpg)
+![Bézier curve](Images/BezierCurve.jpg)
 
 Pressing the spacebar will toggle showing the recursive steps de Casteljau's algorithm does to compute the points on the curve. This recursion is animated and bounces back and forth between the two ends of the Bézier curve. A video of the demo in action can be found [here](https://youtu.be/tw46cDl2kcY).
 
-![Bézier curve with recursion](Bezier Curve Recursion.jpg)
+![Bézier curve with recursion](Images/BezierCurveRecursion.jpg)
 

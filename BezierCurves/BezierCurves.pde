@@ -30,6 +30,7 @@ void mousePressed() {
 }
 
 void keyPressed() {
+  // Pressing the spacebar toggles whether the deCasteljausAlgorithm animation is shown or not.
   if (key==' ') {
     curve.drawAlgo = ! curve.drawAlgo;
   }

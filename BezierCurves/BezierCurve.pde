@@ -53,33 +53,33 @@ class BezierCurve {
   }
 
   /**
-   * De Casteljau's algorithm.
+   * Runs de Casteljau's algorithm to find a point on the curve.
    *
-   * @param t
-   * @return 
+   * @param t The t-value to calculate the point on the curve at. Assumes t is in range [0, 1].
+   * @return The point on the curve.
    */
   PVector deCasteljausAlgorithm(float t) {
     return deCasteljausAlgorithm(t, false);
   }
 
   /**
-   * De Casteljau's algorithm.
+   * Runs de Casteljau's algorithm to find a point on the curve.
    *
-   * @param t
-   * @param drawRecursion
-   * @return 
+   * @param t The t-value to calculate the point on the curve at. Assumes t is in range [0, 1].
+   * @param drawRecursion Whether to draw the recursive steps.
+   * @return The point on the curve.
    */
   PVector deCasteljausAlgorithm(float t, boolean drawRecursion) {
     return deCasteljausAlgorithm(cPoints, t, drawRecursion);
   }
 
   /**
-   * Recursive De Casteljau's algorithm.
+   * Runs de Casteljau's algorithm to find a point on the curve.
    *
-   * @param points
-   * @param t
-   * @param drawRecursion
-   * @return 
+   * @param points The {@code ControlPoint}s of the curve.
+   * @param t The t-value to calculate the point on the curve at. Assumes t is in range [0, 1].
+   * @param drawRecursion Whether to draw the recursive steps.
+   * @return The point on the curve.
    */
   PVector deCasteljausAlgorithm(ControlPoint[] points, float t, boolean drawRecursion) {
     if (points.length == 1) {
@@ -105,12 +105,14 @@ class BezierCurve {
   }
 
   /**
-   * (1 - t) * p0 + t * p1
+   * Preforms linear interpolation on two {@code ControlPoint}s.
    *
-   * @param cp0
-   * @param cp1
-   * @param t
-   * @return 
+   * p = (1 - t) * p0 + t * p1
+   *
+   * @param cp0 The {@code ControlPoint} to interpolate from.
+   * @param cp1 The {@code ControlPoint} to interpolate to.
+   * @param t How far between the two points should be interpolated. Assumes t is in range [0, 1].
+   * @return The interpolated {@code ControlPoint}.
    */
   ControlPoint lerp(ControlPoint cp0, ControlPoint cp1, float t) {
     PVector p0 = cp0.pos.copy();
@@ -124,8 +126,8 @@ class BezierCurve {
    */
   void draw() {
     drawCurve();
-    float p = 20000;
     if (drawAlgo) {
+      float p = 20000;
       float m = millis();
       float t = 2 * abs(m / p - floor(m / p + 0.5));
       drawDeCasteljau(t);
@@ -135,7 +137,7 @@ class BezierCurve {
   }
 
   /**
-   *
+   * Updates the values of the Bezier curve if needed and draws it.
    */
   void drawCurve() {
     strokeWeight(2);
@@ -145,7 +147,7 @@ class BezierCurve {
       PVector prev_point = deCasteljausAlgorithm(0);
       float dist = 0;
       for (int i=0; i<=n_segs; i++) {
-        // Generate point on curve by t value.
+        // Generate point on curve by t-value.
         float t = 1.0 / n_segs * i;
         PVector p = deCasteljausAlgorithm(t);
         curvePoints[i] = p;
@@ -155,7 +157,7 @@ class BezierCurve {
         lut.put(t, dist);
         prev_point = p;
       }
-      
+
       // To prevent the interpolated points to not be generated in order because sets are not ordered.
       Map.Entry<Float, Float>[] entryArr = preprocessEntrySet(lut.entrySet());
 
@@ -195,14 +197,17 @@ class BezierCurve {
   }
 
   /**
+   * Converts a {@code Set<Map.Entry<Float, Float>>} to a {@code Map.Entry<Float, Float>[]} sorted by t-value (the key).
    *
+   * This is to fix a bug where is the Set was directly used not of line segments of the curve would be drawn in the correct order which led to line segments making big jumps.
    *
-   * @param entrySet
-   * @return
+   * @param entrySet The entrySet to convert and sort.
+   * @return An entryArray sorted by t-value (the key).
    */
   Map.Entry<Float, Float>[] preprocessEntrySet(Set<Map.Entry<Float, Float>> entrySet) {
     Map.Entry<Float, Float>[] entryArr = entrySet.toArray(new Map.Entry[0]);
 
+    // Insertion sort http://rosettacode.org/wiki/Sorting_algorithms/Insertion_sort#Java
     for (int i = 1; i < entryArr.length; i++) {
       Map.Entry<Float, Float> value = entryArr[i];
       int j = i - 1;
@@ -217,21 +222,21 @@ class BezierCurve {
   }
 
   /**
+   * Draws the control points in white.
    *
-   *
-   * @param points
+   * @param points The points to draw.
    */
   void drawControlPoints(ControlPoint[] points) {
     drawControlPoints(points, 255, 255, 255);
   }
 
   /**
+   * Draws the control points.
    *
-   *
-   * @param points
-   * @param r
-   * @param g
-   * @param b
+   * @param points The points to draw.
+   * @param r The red value [0, 255].
+   * @param g The green value [0, 255].
+   * @param b The blue value [0, 255].
    */
   void drawControlPoints(ControlPoint[] points, int r, int g, int b) {
     // Draw control point connecting lines
@@ -248,9 +253,9 @@ class BezierCurve {
   }
 
   /**
+   * Draws the resursive steps de Casteljau's algorithm does.
    *
-   *
-   * @param t
+   * @param t The t-value to draw the recursion at.
    */
   void drawDeCasteljau(float t) {
     deCasteljausAlgorithm(t, true);
